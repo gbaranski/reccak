@@ -53,6 +53,16 @@ fn main() {
     }
 }
 
+fn apply_padding(x: &[u8]) -> Vec<u8> {
+    let blocks = ((x.len() as f32 + 1_f32) / 8_f32).ceil() as usize;
+    let mut y = Vec::with_capacity(blocks);
+    y.extend_from_slice(x);
+    y.extend_from_slice(&[0x80]);
+    y.extend(std::iter::repeat(0).take(blocks * 8 - y.len()));
+
+    y
+}
+
 fn digest(a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: &mut Vector) -> [u16; 8] {
     let mut digest: [u16; 8] = [0; 8];
 
@@ -126,6 +136,55 @@ fn round(a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: &mut Vector) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn test_apply_padding_single(msg: &'static [u8], expected_padded: &'static [u8]) {
+        let padded = apply_padding(msg);
+        assert_eq!(padded, expected_padded);
+    }
+
+    #[test]
+    fn test_apply_padding() {
+        
+       test_apply_padding_single(&[0x80], &[
+                                  0x80, 
+                                  0x80, 
+                                  0x00, 
+                                  0x00, 
+                                  0x00, 
+                                  0x00, 
+                                  0x00, 
+                                  0x00]);
+
+        
+
+    }
+
+
+//     #[test]
+//     fn test_apply_padding() {
+//         const MESSAGE: &[u8] = b"";
+//         const MESSAGE_PADDED: &[u8] = &[
+//             0x5A,
+//             0x0F,
+//             0xB1,
+//             0xF1,
+//             0xF0,
+//             0x14,
+//             0x98,
+//             0x27,
+//             0xC5,
+//             0x36,
+//             0x28,
+//             0x0F,
+//             0xEA,
+//             0xD1,
+//             0x67,
+//             0xD1,
+//         ];
+//         let padded = apply_padding(MESSAGE);
+//         assert_eq!(padded, MESSAGE_PADDED);
+// 
+//     }
 
     #[test]
     fn test_round() {
