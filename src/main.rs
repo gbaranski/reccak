@@ -173,5 +173,19 @@ mod tests {
             [0xF1E1, 0xBDCD, 0x76CF, 0x6453, 0x4C68],
         ];
         assert_eq!(a, EXPECTED);
+        let digest = digest(&mut a, &mut b, &mut c, &mut d);
+        // 34 9F 24 8F E7 91 0E 83 D5 55 34 DF 83 3A 48 6C.
+        const EXPECTED_DIGEST: [u16; 8] = [
+            0x349F,
+            0x248F,
+            0xE791,
+            0x0E83,
+            0xD555,
+            0x34DF,
+            0x833A,
+            0x486C,
+        ];
+
+        assert_eq!(digest, EXPECTED_DIGEST);
     }
 }
