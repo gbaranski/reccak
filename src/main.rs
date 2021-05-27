@@ -61,11 +61,13 @@ fn digest(a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: &mut Vector) -> [u1
     digest[2] = a[0][2];
     digest[3] = a[0][3];
     digest[4] = a[0][4];
+    for i in 0..10 {
+        round(a, b, c, d);
+        iota(i, a);
+    }
     digest[5] = a[0][0];
-    round(a, b, c, d);
     digest[6] = a[0][1];
     digest[7] = a[0][2];
-    // digest[8] = a[0][0];
 
     digest
 }
