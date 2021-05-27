@@ -4,20 +4,36 @@ const R: &[u16] = &[
     0x3EC2, 0x738D, 0xB119, 0xC5E7, 0x86C6, 0xDC1B, 0x57D6, 0xDA3A, 0x7710, 0x9200,
 ];
 
+pub const BLOCK_SIZE: usize = 20;
+
 type Digest = [u16; 8];
 type Vector = [u16; 25];
 type Matrix = [[u16; 5]; 5];
 
 pub fn hash(w: &[u8]) -> Digest {
-    let w = utils::apply_padding(w);
-    let w = w
-        .chunks_exact(2)
-        .map(|v| u16::from_be_bytes([v[0], v[1]]))
-        .collect::<Vec<u16>>();
+    // let w = utils::apply_padding(w);
+    let mut w = w.to_vec();
+    utils::add_padding(&mut w);
+    for i in w {
+        println!()
+    }
 
-    let (mut a, mut b, mut c, mut d) = Default::default();
-    init_state(&mut a, &w);
-    apply_all_rounds(&mut a, &mut b, &mut c, &mut d);
+    let mut a: Matrix = Default::default();
+
+    let (mut b, mut c, mut d) = Default::default();
+    for w in w.chunks(20) {
+        let w = w
+            .chunks_exact(2)
+            .map(|v| u16::from_be_bytes([v[0], v[1]]))
+            .collect::<Vec<u16>>();
+
+        for i in 0..5 {
+            a[0][i] ^= w[i];
+            a[1][i] ^= w[i + 5];
+        }
+        // init_state(&mut a, &w);
+        apply_all_rounds(&mut a, &mut b, &mut c, &mut d);
+    }
 
     let mut digest: Digest = [0; 8];
     digest[0..5].copy_from_slice(&a[0][0..5]);

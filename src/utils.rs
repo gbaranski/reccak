@@ -1,9 +1,19 @@
+use crate::BLOCK_SIZE;
+
+pub fn add_padding(input: &mut Vec<u8>) {
+    let payload_size = input.len();
+    let blocks = (payload_size + 1 - 1) / BLOCK_SIZE + 1;
+    let bytes = blocks * BLOCK_SIZE;
+    input.resize(bytes, 0u8);
+    input[payload_size] = 0x80;
+}
+
 pub fn apply_padding(x: &[u8]) -> Vec<u8> {
-    let blocks = ((x.len() as f32 + 1_f32) / 8_f32).ceil() as usize;
+    let blocks = ((x.len() as f32 + 1_f32) / BLOCK_SIZE as f32 + 1_f32).ceil() as usize;
     let mut y = Vec::with_capacity(blocks);
     y.extend_from_slice(x);
     y.extend_from_slice(&[0x80]);
-    y.extend(std::iter::repeat(0).take(blocks * 8 - y.len()));
+    y.extend(std::iter::repeat(0).take(blocks * BLOCK_SIZE - y.len()));
 
     y
 }
