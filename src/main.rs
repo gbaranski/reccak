@@ -29,8 +29,6 @@ fn main() {
     let mut c: [u16; 25] = Default::default();
     let mut d: [u16; 25] = Default::default();
 
-    // let mut digest: [u16; 6] = [0; 6];
-
     for i in 0..5 {
         for j in 0..5 {
             let cv = if w.len() <= j + 5 * i {
@@ -43,14 +41,33 @@ fn main() {
     }
 
     for i in 0..10 {
-        round(i, &mut a, &mut b, &mut c, &mut d);
+        round(&mut a, &mut b, &mut c, &mut d);
+        iota(i, &mut a);
     }
-    println!("Finished");
-    for i in 0..5 {
-        for j in 0..5 {
-            println!("a[{}][{}] = 0x{:X}", i, j, a[i][j])
-        }
+
+    let digest = digest(&mut a, &mut b, &mut c, &mut d);
+    for e in digest.iter() {
+        let bytes = e.to_be_bytes();
+        println!("0x{:X}", bytes[0]);
+        println!("0x{:X}", bytes[1]);
     }
+}
+
+fn digest(a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: &mut Vector) -> [u16; 8] {
+    let mut digest: [u16; 8] = [0; 8];
+
+    digest[0] = a[0][0];
+    digest[1] = a[0][1];
+    digest[2] = a[0][2];
+    digest[3] = a[0][3];
+    digest[4] = a[0][4];
+    digest[5] = a[0][0];
+    round(a, b, c, d);
+    digest[6] = a[0][1];
+    digest[7] = a[0][2];
+    // digest[8] = a[0][0];
+
+    digest
 }
 
 fn theta(a: &mut Matrix, c: &mut Vector, d: &mut Vector) {
@@ -97,12 +114,11 @@ fn iota(i: usize, a: &mut Matrix) {
     a[0][0] = a[0][0] ^ R[i];
 }
 
-fn round(i: usize, a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: &mut Vector) {
+fn round(a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: &mut Vector) {
     theta(a, c, d);
     rho(a);
     pi(a, b);
     chi(a, b);
-    iota(i, a);
 }
 
 #[cfg(test)]
@@ -145,7 +161,8 @@ mod tests {
         }
 
         for i in 0..10 {
-            round(i, &mut a, &mut b, &mut c, &mut d);
+            round(&mut a, &mut b, &mut c, &mut d);
+            iota(i, &mut a);
         }
 
         const EXPECTED: [[u16; 5]; 5] = [
