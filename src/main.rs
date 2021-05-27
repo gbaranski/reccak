@@ -144,19 +144,40 @@ mod tests {
 
     #[test]
     fn test_apply_padding() {
-        
-       test_apply_padding_single(&[0x80], &[
-                                  0x80, 
-                                  0x80, 
-                                  0x00, 
-                                  0x00, 
-                                  0x00, 
-                                  0x00, 
-                                  0x00, 
-                                  0x00]);
+        let padded = apply_padding(&[]);
+        assert_eq!(padded, &[
+                   0x80, 
+                   0x00, 
+                   0x00, 
+                   0x00, 
+                   0x00, 
+                   0x00, 
+                   0x00, 
+                   0x00
+        ]);
+        let padded = apply_padding(&[0x80]);
+        assert_eq!(padded, &[
+                   0x80, 
+                   0x80, 
+                   0x00, 
+                   0x00, 
+                   0x00, 
+                   0x00, 
+                   0x00, 
+                   0x00
+        ]);
 
-        
-
+        let padded = apply_padding(&[0x00, 0x01, 0x02, 0x03]);
+        assert_eq!(padded, &[
+                   0x00,
+                   0x01,
+                   0x02,
+                   0x03,
+                   0x80, 
+                   0x00, 
+                   0x00, 
+                   0x00, 
+        ]);
     }
 
 
