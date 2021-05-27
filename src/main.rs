@@ -137,11 +137,6 @@ fn round(a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: &mut Vector) {
 mod tests {
     use super::*;
 
-    fn test_apply_padding_single(msg: &'static [u8], expected_padded: &'static [u8]) {
-        let padded = apply_padding(msg);
-        assert_eq!(padded, expected_padded);
-    }
-
     #[test]
     fn test_apply_padding() {
         let padded = apply_padding(&[]);
@@ -177,6 +172,60 @@ mod tests {
                    0x00, 
                    0x00, 
                    0x00, 
+        ]);
+
+        let padded = apply_padding(&[0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06]);
+        assert_eq!(padded, &[
+                   0x00,
+                   0x01,
+                   0x02,
+                   0x03,
+                   0x04,
+                   0x05,
+                   0x06,
+                   0x80, 
+        ]);
+
+        let padded = apply_padding(&[0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]);
+        assert_eq!(padded, &[
+                   0x00,
+                   0x01,
+                   0x02,
+                   0x03,
+                   0x04,
+                   0x05,
+                   0x06,
+                   0x07,
+                   0x80, 
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+
+        ]);
+
+        let padded = apply_padding(&[0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]);
+        assert_eq!(padded, &[
+                   0x00,
+                   0x01,
+                   0x02,
+                   0x03,
+                   0x04,
+                   0x05,
+                   0x06,
+                   0x07,
+                   0x08,
+                   0x80, 
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+
         ]);
     }
 
