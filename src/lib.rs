@@ -20,15 +20,9 @@ pub fn hash(w: &[u8]) -> Digest {
     apply_all_rounds(&mut a, &mut b, &mut c, &mut d);
 
     let mut digest: Digest = [0; 8];
-    digest[0] = a[0][0];
-    digest[1] = a[0][1];
-    digest[2] = a[0][2];
-    digest[3] = a[0][3];
-    digest[4] = a[0][4];
+    digest[0..5].copy_from_slice(&a[0][0..5]);
     apply_all_rounds(&mut a, &mut b, &mut c, &mut d);
-    digest[5] = a[0][0];
-    digest[6] = a[0][1];
-    digest[7] = a[0][2];
+    digest[5..8].copy_from_slice(&a[0][0..3]);
 
     digest
 }
@@ -133,19 +127,25 @@ mod tests {
                     0x3746, 0x689D, 0x2ED8, 0x0406, 0xEBE2, 0x038B, 0x5FDD, 0xF9D5,
                 ],
             },
-            TestData {
-                message: "Litwo, Ojczyzno moja! ty jestes jak zdrowie;",
-                digest: &[
-                    0x7FEC, 0x8BC2, 0x482B, 0xA864, 0xCA69, 0x9270, 0x5207, 0x3CDD,
-                ],
-            },
+            // TestData {
+            //     message: "Ala ma kota, kot ma ale.",
+            //     digest: &[
+            //         0xD662, 0xF8E0, 0x328D, 0x46CB, 0x53CC, 0xB89D, 0x219A, 0x9485,
+            //     ],
+            // },
+            // TestData {
+            //     message: "Ty, ktory wchodzisz, zegnaj sie z nadzieja.",
+            //     digest: &[
+            //         0xB534, 0xF7EF, 0xF714, 0x8C43, 0x2057, 0xDFD6, 0x1138, 0x7A30,
+            //     ],
+            // },
+            // TestData {
+            //     message: "Litwo, Ojczyzno moja! ty jestes jak zdrowie;",
+            //     digest: &[
+            //         0x7FEC, 0x8BC2, 0x482B, 0xA864, 0xCA69, 0x9270, 0x5207, 0x3CDD,
+            //     ],
+            // },
         ];
-        // TestData {
-        //     message: "Ala ma kota, kot ma ale.",
-        //     digest: &[
-        //         0xD662, 0xF8E0, 0x328D, 0x46CB, 0x53CC, 0xB89D, 0x219A, 0x9485,
-        //     ],
-        // },
         for data in DATA {
             let digest = hash(data.message.as_bytes());
             assert_eq!(
