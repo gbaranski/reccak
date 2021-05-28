@@ -16,3 +16,11 @@ criterion = "0.3.4"
 [[bench]]
 name = "benchmark"
 harness = false
+
+[[bin]]
+name = "hash"
+path = "src/hash.rs"
+
+[[bin]]
+name = "reverse-hash"
+path = "src/reverse_hash.rs"
