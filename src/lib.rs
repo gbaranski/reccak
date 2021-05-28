@@ -11,7 +11,7 @@ type Vector = [u16; 25];
 type Matrix = [[u16; 5]; 5];
 
 pub fn hash(w: &[u8]) -> Digest {
-    let mut w = w.to_vec();
+    let w = w.to_vec();
     let w = apply_padding(w.clone().as_slice());
 
     let mut a: Matrix = Default::default();
