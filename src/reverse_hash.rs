@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use reccak::{hash, Digest, Input};
 use std::thread;
 
@@ -62,7 +61,7 @@ fn main() {
                     );
                 })
             })
-            .collect_vec();
+            .collect::<Vec<_>>();
         for handle in handles {
             handle.join().unwrap();
         }
