@@ -63,19 +63,6 @@ fn apply_round(round: usize, a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: 
     iota(round, a);
 }
 
-fn init_state(a: &mut Matrix, w: &[u16]) {
-    for i in 0..5 {
-        for j in 0..5 {
-            let cv = if w.len() <= j + 5 * i {
-                0
-            } else {
-                w[j + 5 * i]
-            };
-            a[i][j] = cv;
-        }
-    }
-}
-
 fn theta(a: &mut Matrix, c: &mut Vector, d: &mut Vector) {
     for i in 0..5 {
         c[i] = a[i][0] ^ a[i][1] ^ a[i][2] ^ a[i][3] ^ a[i][4];
