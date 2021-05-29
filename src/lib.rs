@@ -1,4 +1,6 @@
 mod utils;
+mod permutation;
+pub use permutation::permutations;
 use smallvec::SmallVec;
 
 const R: &[u16] = &[
