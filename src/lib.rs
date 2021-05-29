@@ -6,7 +6,7 @@ const R: &[u16] = &[
 
 pub const BLOCK_SIZE: usize = 20;
 
-type Digest = [u16; 8];
+pub type Digest = [u16; 8];
 type Vector = [u16; 25];
 type Matrix = [[u16; 5]; 5];
 
