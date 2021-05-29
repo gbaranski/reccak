@@ -4,14 +4,18 @@ use crate::Input;
 pub struct PermutationIterator {
     universe: &'static [u8],
     size: usize,
-    prev: Option<Input>,
+    prev: Input,
 }
 
 pub fn permutations(universe: &'static [u8], size: usize) -> PermutationIterator {
+    let prev = std::iter::repeat(0)
+        .take(size)
+        .collect::<Input>();
+
     PermutationIterator {
         size,
         universe,
-        prev: None,
+        prev,
     }
 }
 
@@ -21,31 +25,21 @@ impl Iterator for PermutationIterator {
     fn next(&mut self) -> Option<Self::Item> {
         let n = self.universe.len();
 
-        match self.prev {
-            None => {
-                let zeroes: Input = std::iter::repeat(0).take(self.size).collect();
-                let result = zeroes
+        match self.prev.iter().position(|i| *i + 1 < n as u8) {
+            None => None,
+            Some(position) => {
+                for index in self.prev.iter_mut().take(position) {
+                    *index = 0;
+                }
+                self.prev[position] += 1;
+                let universe = self.universe;
+                let result = self
+                    .prev
                     .iter()
-                    .map(|&i| self.universe[i as usize].clone())
-                    .collect::<Input>();
-                self.prev = Some(zeroes);
+                    .map(|&i| universe[i as usize].clone())
+                    .collect();
                 Some(result)
             }
-            Some(ref mut indexes) => match indexes.iter().position(|&i| i + 1 < n as u8) {
-                None => None,
-                Some(position) => {
-                    for index in indexes.iter_mut().take(position) {
-                        *index = 0;
-                    }
-                    indexes[position] += 1;
-                    let universe = self.universe;
-                    let result = indexes
-                        .iter()
-                        .map(|&i| universe[i as usize].clone())
-                        .collect();
-                    Some(result)
-                }
-            },
         }
     }
 }
