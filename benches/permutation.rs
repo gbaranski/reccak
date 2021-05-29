@@ -7,7 +7,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 b"qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#%^-_=+([{<)]}>",
                 5,
             )
-            .take(1000000)
+            .take(100000)
             .collect::<Vec<_>>()
         })
     });
