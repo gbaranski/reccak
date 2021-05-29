@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use reccak::{hash, Digest};
+use reccak::{hash, Digest, Input};
 use std::thread;
 
 const CHARS: &[u8] =
@@ -26,11 +26,9 @@ const DIGESTS: &[(Digest, usize)] = &[
     ),
 ];
 
-fn worker<'a>(permutations: impl Iterator<Item = Vec<&'a u8>>, expected_digest: Digest) {
+fn worker<'a>(permutations: impl Iterator<Item = Input>, expected_digest: Digest) {
     for permutation in permutations {
-        let permutation = permutation.iter().map(|e| **e).collect::<Vec<u8>>();
-        let permutation = permutation.as_slice();
-        let calculated_digest = hash(permutation);
+        let calculated_digest = hash(permutation.clone().into());
         if calculated_digest == expected_digest {
             println!(
                 "found matching permutation: `{}` for digest: `{:X?}`",
@@ -49,7 +47,7 @@ fn main() {
             "starting search for {:?} with input size: {}",
             expected_digest, *input_size
         );
-        let permutations = CHARS.iter().permutations(*input_size).unique();
+        let permutations = permutations(*input_size);
         let chunk_size = CHARS.len().pow(*input_size as u32) / cpus;
         let cpus = 0..cpus;
         let handles = cpus
@@ -65,9 +63,49 @@ fn main() {
                 })
             })
             .collect_vec();
-
         for handle in handles {
             handle.join().unwrap();
+        }
+    }
+}
+
+#[derive(Clone)]
+struct PermutationIterator {
+    size: usize,
+    prev: Option<Input>,
+}
+
+fn permutations(size: usize) -> PermutationIterator {
+    PermutationIterator { size, prev: None }
+}
+
+impl Iterator for PermutationIterator {
+    type Item = Input;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let n = CHARS.len();
+
+        match self.prev {
+            None => {
+                let zeroes: Input = std::iter::repeat(0).take(self.size).collect();
+                let result = zeroes
+                    .iter()
+                    .map(|&i| CHARS[i as usize].clone())
+                    .collect::<Input>();
+                self.prev = Some(zeroes);
+                Some(result)
+            }
+            Some(ref mut indexes) => match indexes.iter().position(|&i| i + 1 < n as u8) {
+                None => None,
+                Some(position) => {
+                    for index in indexes.iter_mut().take(position) {
+                        *index = 0;
+                    }
+                    indexes[position] += 1;
+                    let result = indexes.iter().map(|&i| CHARS[i as usize].clone()).collect();
+                    Some(result)
+                }
+            },
         }
     }
 }

@@ -1,7 +1,10 @@
+use std::io::Read;
+use smallvec::SmallVec;
+
 fn main() {
-    let mut input = String::new();
-    std::io::stdin().read_line(&mut input);
-    let output = reccak::hash(input.as_bytes());
+    let mut input: SmallVec::<[u8; 32]> = SmallVec::new();
+    std::io::stdin().read(&mut input).unwrap();
+    let output = reccak::hash(input.into());
     print!("0x");
     for e in output.iter() {
         print!("{:X}", e);

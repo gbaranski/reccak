@@ -1,4 +1,5 @@
 mod utils;
+use smallvec::SmallVec;
 
 const R: &[u16] = &[
     0x3EC2, 0x738D, 0xB119, 0xC5E7, 0x86C6, 0xDC1B, 0x57D6, 0xDA3A, 0x7710, 0x9200,
@@ -6,22 +7,30 @@ const R: &[u16] = &[
 
 pub const BLOCK_SIZE: usize = 20;
 
+
+pub type Input = SmallVec::<[u8; 32]>;
 pub type Digest = [u16; 8];
 type Vector = [u16; 25];
 type Matrix = [[u16; 5]; 5];
 
-pub fn hash(w: &[u8]) -> Digest {
-    let w = w.to_vec();
-    let w = apply_padding(w.clone().as_slice());
+fn u8_to_u16(src: &[u8], dest: &mut [u16]) {
+    let mut i = 0;
+    while i < src.len() {
+        dest[i / 2] = u16::from_be_bytes([src[i], src[i + 1]]);
+        i += 2;
+    }
+}
+
+pub fn hash(mut w: Input) -> Digest {
+    apply_padding(&mut w);
 
     let mut a: Matrix = Default::default();
 
     let (mut b, mut c, mut d) = Default::default();
     for w in w.chunks(20) {
-        let w = w
-            .chunks_exact(2)
-            .map(|v| u16::from_be_bytes([v[0], v[1]]))
-            .collect::<Vec<u16>>();
+        let mut w_16bit = [0; 10];
+        u8_to_u16(&w, &mut w_16bit);
+        let w = w_16bit;
 
         for i in 0..5 {
             a[0][i] ^= w[i];
@@ -38,15 +47,10 @@ pub fn hash(w: &[u8]) -> Digest {
     digest
 }
 
-
- fn apply_padding(x: &[u8]) -> Vec<u8> {
+fn apply_padding(x: &mut Input) {
     let blocks = ((x.len() as f32 + 1_f32) / BLOCK_SIZE as f32).ceil() as usize;
-    let mut y = Vec::with_capacity(blocks);
-    y.extend_from_slice(x);
-    y.extend_from_slice(&[0x80]);
-    y.extend(std::iter::repeat(0).take(blocks * BLOCK_SIZE - y.len()));
-
-    y
+    x.extend_from_slice(&[0x80]);
+    x.extend(std::iter::repeat(0).take(blocks * BLOCK_SIZE - x.len()));
 }
 
 fn apply_all_rounds(a: &mut Matrix, b: &mut Matrix, c: &mut Vector, d: &mut Vector) {
@@ -114,7 +118,7 @@ mod tests {
     #[test]
     fn test_hash() {
         [
-(
+            (
                 "",
                 [
                     0xE2, 0x25, 0x5B, 0xFB, 0xD3, 0xCF, 0x86, 0xE0, 0xDB, 0xE5, 0x2A, 0xA9, 0x67,
@@ -173,12 +177,13 @@ mod tests {
         ]
         .iter()
         .for_each(|(message, expected_hash)| {
+            let message = SmallVec::from(message.as_bytes());
             let expected_hash = expected_hash
                 .chunks_exact(2)
                 .map(|v| u16::from_be_bytes([v[0], v[1]]))
                 .collect::<Vec<u16>>();
-            let hash = hash(message.as_bytes());
-            assert_eq!(hash, expected_hash.as_slice(), "for message {}", message,);
+            let hash = hash(message.clone());
+            assert_eq!(hash, expected_hash.as_slice(), "for message {:?}", message,);
         });
     }
 }
