@@ -3,13 +3,6 @@ use smallvec::smallvec;
 
 fn criterion_benchmark(c: &mut Criterion) {
     let message: reccak::Input = smallvec![1, 2, 3, 4, 5];
-    c.bench_function("generate permutations", |b| {
-        b.iter(|| {
-            reccak::permutations(b"abcdefghijklmnoprstwxyz", 5)
-                .take(10)
-                .collect::<Vec<_>>()
-        })
-    });
     c.bench_function("hash data", |b| {
         b.iter(|| reccak::hash(message.clone().into()))
     });

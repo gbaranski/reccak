@@ -13,10 +13,14 @@ smallvec = "1.6.1"
 [dev-dependencies]
 criterion = "0.3.4"
 
+[[bench]]
+name = "permutation"
+harness = false
 
 [[bench]]
-name = "benchmark"
+name = "hash"
 harness = false
+
 
 [[bin]]
 name = "hash"
