@@ -152,7 +152,7 @@ fn main() {
         let start = Instant::now();
         let input = worker_pool.distribute_reverse_hash(input_size, expected_digest);
         println!(
-            "reversed hash {:X?}, input is: `{}`, took {:?}",
+            "Reversed hash {:X?}, input is: `{}`, took {:?}",
             expected_digest,
             std::str::from_utf8(input.as_slice()).unwrap(),
             start.elapsed()
