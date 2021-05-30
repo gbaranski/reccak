@@ -32,7 +32,7 @@ fn reverse_hash(
     expected_digest: Digest,
 ) -> Option<Input> {
     for permutation in permutations {
-        let calculated_digest = hash(permutation.clone().into());
+        let calculated_digest = hash(permutation.clone());
         if calculated_digest == expected_digest {
             return Some(permutation);
         }
@@ -91,7 +91,7 @@ impl Worker {
     ) {
         self.request
             .send(WorkerRequest::Job {
-                permutations: permutations.into(),
+                permutations,
                 expected_digest,
             })
             .expect("failed sending work");

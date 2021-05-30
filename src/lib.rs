@@ -1,5 +1,5 @@
-mod utils;
 mod permutation;
+mod utils;
 pub use permutation::{permutations, PermutationIterator};
 use smallvec::SmallVec;
 
@@ -9,8 +9,7 @@ const R: &[u16] = &[
 
 pub const BLOCK_SIZE: usize = 20;
 
-
-pub type Input = SmallVec::<[u8; 32]>;
+pub type Input = SmallVec<[u8; 32]>;
 pub type Digest = [u16; 8];
 type Vector = [u16; 25];
 type Matrix = [[u16; 5]; 5];
@@ -78,17 +77,18 @@ fn theta(a: &mut Matrix, c: &mut Vector, d: &mut Vector) {
         d[i] = c[(i as isize - 1).rem_euclid(5) as usize] ^ (c[(i + 1) % 5].rotate_left(1));
     }
 
-    for i in 0..5 {
-        for j in 0..5 {
-            a[i][j] = a[i][j] ^ d[i];
+    for (i, item) in a.iter_mut().enumerate() {
+        for item in item.iter_mut() {
+            *item ^= d[i];
         }
+        
     }
 }
 
 fn rho(a: &mut Matrix) {
-    for i in 0..5 {
-        for j in 0..5 {
-            a[i][j] = a[i][j].rotate_left((7 * i + j.rem_euclid(5)) as u32);
+    for (i, item) in a.iter_mut().enumerate() {
+        for (j, item) in item.iter_mut().enumerate() {
+            *item = item.rotate_left((7 * i + j.rem_euclid(5)) as u32)
         }
     }
 }
@@ -110,7 +110,7 @@ fn chi(a: &mut Matrix, b: &Matrix) {
 }
 
 fn iota(i: usize, a: &mut Matrix) {
-    a[0][0] = a[0][0] ^ R[i];
+    a[0][0] ^= R[i];
 }
 
 #[cfg(test)]

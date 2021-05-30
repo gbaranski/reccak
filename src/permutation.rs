@@ -8,13 +8,11 @@ pub struct PermutationIterator {
 }
 
 pub fn permutations(universe: &'static [u8], size: usize) -> PermutationIterator {
-    let prev = std::iter::repeat(0)
-        .take(size)
-        .collect::<Input>();
+    let prev = std::iter::repeat(0).take(size).collect::<Input>();
 
     PermutationIterator {
-        size,
         universe,
+        size,
         prev,
     }
 }
@@ -33,11 +31,7 @@ impl Iterator for PermutationIterator {
                 }
                 self.prev[position] += 1;
                 let universe = self.universe;
-                let result = self
-                    .prev
-                    .iter()
-                    .map(|&i| universe[i as usize].clone())
-                    .collect();
+                let result = self.prev.iter().map(|&i| universe[i as usize]).collect();
                 Some(result)
             }
         }
