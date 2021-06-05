@@ -1,5 +1,7 @@
 mod permutation;
 mod utils;
+pub mod reverse_hash;
+
 pub use permutation::{permutations, PermutationIterator};
 use smallvec::SmallVec;
 
