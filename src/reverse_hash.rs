@@ -145,8 +145,12 @@ impl Drop for WorkerPool {
 }
 
 fn main() {
-    let cpus = num_cpus::get();
-    let worker_pool = WorkerPool::new(cpus);
+    let workers = match std::env::var_os("WORKERS") {
+        Some(value) => str::parse::<usize>(value.to_str().unwrap()).expect("invalid `WORKERS` environment variable"),
+        None => num_cpus::get(),
+    };
+
+    let worker_pool = WorkerPool::new(workers);
 
     for &(expected_digest, input_size) in DIGESTS {
         let start = Instant::now();
